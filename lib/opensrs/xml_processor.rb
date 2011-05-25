@@ -39,7 +39,7 @@ module OpenSRS
         dt_array << item_node
       end
 
-      return dt_array
+      dt_array
     end
 
     def self.encode_dt_assoc(data, container)
@@ -53,7 +53,7 @@ module OpenSRS
         dt_assoc << item_node
       end
 
-      return dt_assoc
+      dt_assoc
     end
 
     # Recursively decodes individual data elements from OpenSRS
