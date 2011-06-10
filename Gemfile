@@ -1,6 +1,6 @@
 source "http://rubygems.org"
 
-gem "libxml-ruby", "~> 1.0.0"
+gem "libxml-ruby", "~> 2.0.0"
 
 group :development do
   gem "nokogiri"

@@ -7,7 +7,7 @@ GEM
       bundler (~> 1.0.0)
       git (>= 1.2.5)
       rake
-    libxml-ruby (1.0.0)
+    libxml-ruby (2.0.4)
     nokogiri (1.4.4)
     rake (0.8.7)
     rspec (2.5.0)
@@ -28,7 +28,7 @@ DEPENDENCIES
   bundler
   git
   jeweler
-  libxml-ruby (~> 1.0.0)
+  libxml-ruby (~> 2.0.0)
   nokogiri
   rake
   rspec (~> 2.0)
