@@ -7,15 +7,15 @@ describe OpenSRS::Server do
 
   describe "#test xml processor" do
     context "on class initialization" do
-      it { @server.xml_processor.should eql(OpenSRS::XmlProcessor::Libxml) }
+      it { @server.xml_processor.should eql(OpenSRS::XmlProcessor::Nokogiri) }
     end
 
     context "on changing xml processor" do
       before(:each) do
-        OpenSRS::Server.xml_processor = :nokogiri
+        OpenSRS::Server.xml_processor = :libxml
       end
 
-      it { @server.xml_processor.should eql(OpenSRS::XmlProcessor::Nokogiri) }
+      it { @server.xml_processor.should eql(OpenSRS::XmlProcessor::Libxml) }
     end
   end
 end
