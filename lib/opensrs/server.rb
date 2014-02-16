@@ -28,7 +28,7 @@ module OpenSRS
       xml = xml_processor.build(attributes.merge!(options))
       log(xml, "Request XML for #{options[:object]} #{options[:action]}")
 
-      response        = http.post(server.path, xml, headers(xml))
+      response        = http.post(server_path, xml, headers(xml))
       log(response.body, "Response XML for #{options[:object]} #{options[:action]}")
 
       parsed_response = xml_processor.parse(response.body)

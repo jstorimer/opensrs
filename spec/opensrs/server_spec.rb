@@ -68,7 +68,7 @@ describe OpenSRS::Server do
     end
 
     it "defaults path to '/'" do
-      server.server = URI.parse 'http://no-path.com/'
+      server.server = URI.parse 'http://no-path.com'
       http.should_receive(:post).with('/', xml, header).and_return double.as_null_object
       server.call
     end
