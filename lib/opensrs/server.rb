@@ -11,25 +11,25 @@ module OpenSRS
     attr_accessor :server, :username, :password, :key, :timeout, :open_timeout, :logger
 
     def initialize(options = {})
-      @server       = URI.parse(options[:server] || "https://rr-n1-tor.opensrs.net:55443/")
-      @username     = options[:username]
-      @password     = options[:password]
-      @key          = options[:key]
-      @timeout      = options[:timeout]
-      @open_timeout = options[:open_timeout]
-      @logger       = options[:logger]
+      @server   = URI.parse(options[:server] || "https://rr-n1-tor.opensrs.net:55443/")
+      @username = options[:username]
+      @password = options[:password]
+      @key      = options[:key]
+      @timeout  = options[:timeout]
+      @open_timeout  = options[:open_timeout]
+      @logger   = options[:logger]
     end
 
-    def call(options = {})
-      attributes = {
-        :protocol => "XCP"
-      }
+    def call(data = {})
+      xml = xml_processor.build({ :protocol => "XCP" }.merge!(data))
+      log('Request', xml, data)
 
-      xml = xml_processor.build(attributes.merge!(options))
-      log(xml, "Request XML for #{options[:object]} #{options[:action]}")
-
-      response        = http.post(server_path, xml, headers(xml))
-      log(response.body, "Response XML for #{options[:object]} #{options[:action]}")
+      begin
+        response = http.post(server_path, xml, headers(xml))
+        log('Response', xml, data)
+      rescue Net::HTTPBadResponse
+        raise OpenSRS::BadResponse, "Received a bad response from OpenSRS. Please check that your IP address is added to the whitelist, and try again."
+      end
 
       parsed_response = xml_processor.parse(response.body)
       return OpenSRS::Response.new(parsed_response, xml, response.body)
@@ -73,11 +73,13 @@ module OpenSRS
       http
     end
 
-    def log(data, message)
+    def log(type, data, options = {})
       return unless logger
 
-      message = "[OpenSRS] " + message
-      line = [message, data].join("\n")
+      message = "[OpenSRS] #{type} XML"
+      message = "#{message} for #{options[:object]} #{options[:action]}" if options[:object] && options[:action]
+
+      line = [message, data].join('\n')
       logger.info(line)
     end
 

@@ -1,4 +1,4 @@
-= OpenSRS http://travis-ci.org/voxxit/opensrs.png
+= OpenSRS
 
 {<img src="https://travis-ci.org/voxxit/opensrs.png" />}[https://travis-ci.org/voxxit/opensrs]
 {<img src="https://codeclimate.com/github/voxxit/opensrs.png" />}[https://codeclimate.com/github/voxxit/opensrs]

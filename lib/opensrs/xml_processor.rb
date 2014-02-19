@@ -17,9 +17,9 @@ module OpenSRS
     # Encodes individual elements, and their child elements, for the root XML document.
     def self.encode_data(data, container = nil)
       case data
-      when Array 
+      when Array
         encode_dt_array(data, container)
-      when Hash  
+      when Hash
         encode_dt_assoc(data, container)
       when String, Numeric, Date, Time, Symbol, NilClass
         data.to_s
