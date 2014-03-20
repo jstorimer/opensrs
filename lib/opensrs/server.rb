@@ -4,34 +4,42 @@ require "digest/md5"
 require "openssl"
 
 module OpenSRS
-  class BadResponse < StandardError; end
-  
+  class OpenSRSError < StandardError; end
+
+  class BadResponse < OpenSRSError; end
+  class TimeoutError < OpenSRSError; end
+  class ConnectionError < OpenSRSError; end
+
   class Server
-    attr_accessor :server, :username, :password, :key, :logger
+    attr_accessor :server, :username, :password, :key, :timeout, :open_timeout, :logger
 
     def initialize(options = {})
       @server   = URI.parse(options[:server] || "https://rr-n1-tor.opensrs.net:55443/")
       @username = options[:username]
       @password = options[:password]
       @key      = options[:key]
+      @timeout  = options[:timeout]
+      @open_timeout  = options[:open_timeout]
       @logger   = options[:logger]
     end
 
-    def call(options = {})
-      attributes = {
-        :protocol => "XCP"
-      }
-      
-      xml = xml_processor.build(attributes.merge!(options))
-      log(xml, "Request XML for #{options[:object]} #{options[:action]}")
+    def call(data = {})
+      xml = xml_processor.build({ :protocol => "XCP" }.merge!(data))
+      log('Request', xml, data)
 
-      response        = http.post(server.path, xml, headers(xml))
-      log(response.body, "Response XML for #{options[:object]} #{options[:action]}")
+      begin
+        response = http.post(server_path, xml, headers(xml))
+        log('Response', xml, data)
+      rescue Net::HTTPBadResponse
+        raise OpenSRS::BadResponse, "Received a bad response from OpenSRS. Please check that your IP address is added to the whitelist, and try again."
+      end
+
       parsed_response = xml_processor.parse(response.body)
-      
       return OpenSRS::Response.new(parsed_response, xml, response.body)
-    rescue Net::HTTPBadResponse
-      raise OpenSRS::BadResponse, "Received a bad response from OpenSRS. Please check that your IP address is added to the whitelist, and try again."
+    rescue Timeout::Error => err
+      raise OpenSRS::TimeoutError, err
+    rescue Errno::ECONNRESET, Errno::ECONNREFUSED => err
+      raise OpenSRS::ConnectionError, err
     end
 
     def xml_processor
@@ -44,39 +52,44 @@ module OpenSRS
     end
 
     OpenSRS::Server.xml_processor = :nokogiri
-    
+
     private
-    
+
     def headers(request)
-      headers = {
-        "Content-Length"  => request.length.to_s,
+      { "Content-Length"  => request.length.to_s,
         "Content-Type"    => "text/xml",
         "X-Username"      => username,
         "X-Signature"     => signature(request)
       }
-      
-      return headers
     end
-    
+
     def signature(request)
       signature = Digest::MD5.hexdigest(request + key)
       signature = Digest::MD5.hexdigest(signature + key)
       signature
     end
-    
+
     def http
       http = Net::HTTP.new(server.host, server.port)
       http.use_ssl = (server.scheme == "https")
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.read_timeout = http.open_timeout = @timeout if @timeout
+      http.open_timeout = @open_timeout                if @open_timeout
       http
     end
 
-    def log(data, message)
+    def log(type, data, options = {})
       return unless logger
 
-      message = "[OpenSRS] " + message
-      line = [message, data].join("\n")
+      message = "[OpenSRS] #{type} XML"
+      message = "#{message} for #{options[:object]} #{options[:action]}" if options[:object] && options[:action]
+
+      line = [message, data].join('\n')
       logger.info(line)
+    end
+
+    def server_path
+      server.path.empty? ? '/' : server.path
     end
   end
 end
