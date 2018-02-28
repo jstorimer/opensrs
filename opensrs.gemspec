@@ -5,7 +5,7 @@ require "opensrs/version"
 
 Gem::Specification.new do |spec|
 
-  spec.name          = "opensrs"
+  spec.name          = "shopify-opensrs"
   spec.version       = OpenSRS::VERSION
   spec.authors       = [ "Joshua Delsman" ]
   spec.email         = [ "j@srv.im" ]
