@@ -1,0 +1,19 @@
+name: opensrs-shopify
+
+type: ruby
+
+up:
+  - homebrew:
+    - openssl
+  - ruby: 2.3.0
+  - bundler
+
+commands:
+  console:
+    desc:   'start a console'
+    run:    bin/console
+  test:
+    syntax:
+      argument: file
+      optional: args...
+    run: bundle exec rspec spec
