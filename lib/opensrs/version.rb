@@ -1,3 +1,3 @@
 module OpenSRS
-  VERSION = "0.3.10"
+  VERSION = "0.3.13"
 end
