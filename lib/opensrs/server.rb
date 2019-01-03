@@ -18,7 +18,8 @@ module OpenSRS
                   :timeout,
                   :open_timeout,
                   :logger,
-                  :sanitize_logs
+                  :sanitize_logs,
+                  :proxy
 
     SANITIZING_METHODS = [
       :sanitize_rw_register
@@ -33,6 +34,7 @@ module OpenSRS
       @open_timeout = options[:open_timeout]
       @logger   = options[:logger]
       @sanitize_logs = options[:sanitize_logs]
+      @proxy    = URI.parse(options[:proxy]) if options[:proxy]
     end
 
     def call(data = {})
@@ -79,7 +81,12 @@ module OpenSRS
     end
 
     def http
-      http = Net::HTTP.new(server.host, server.port)
+      if @proxy
+        http = Net::HTTP.new server.host, server.port,
+          @proxy.host, @proxy.port, @proxy.user, @proxy.password
+      else
+        http = Net::HTTP.new(server.host, server.port)
+      end
       http.use_ssl = (server.scheme == "https")
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.read_timeout = http.open_timeout = @timeout if @timeout
