@@ -57,6 +57,16 @@ To connect, instantiate a new <tt>OpenSRS::Server</tt> object:
 
 **NOTE:** Connecting to OpenSRS requires that you add the IP(s) you're connecting from to their whitelist. Log in to the testing or production servers, and add your IP(s) under Profile Management > Add IPs for Script/API Access. IP changes take about one hour to take effect.
 
+Since OpenSRS only allows up to 5 IPs to be whitelisted, you may wish to use a proxy. `OpenSRS::Server` uses `Net::HTTP`, so you can configure an unauthenticated proxy with the `http_proxy` environment variable. If the proxy requires authentication, you must supply it explicitly:
+
+    server = OpenSRS::Server.new(
+      server:   "https://rr-n1-tor.opensrs.net:55443/",
+      username: "testing",
+      password: "53cr3t",
+      key:      "c633be3170c7fb3fb29e2f99b84be2410...",
+      proxy:    "http://user:password@example.com:8080",
+    )
+
 If you would like, you can provide OpenSRS::Server with a logger to write the contents of the requests and responses
 with OpenSRS. The assumption is you are using a Rails-like logger, but as long as your logger has an info method you
 are fine. You can simply assign the logger or pass it in as an initialization option:
