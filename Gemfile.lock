@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shopify-opensrs (0.3.14)
+    shopify-opensrs (0.3.15)
 
 GEM
   remote: https://rubygems.org/
@@ -93,4 +93,4 @@ DEPENDENCIES
   shoulda
 
 BUNDLED WITH
-   1.16.1
+   1.17.3
