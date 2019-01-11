@@ -18,6 +18,7 @@ module OpenSRS
                   :timeout,
                   :open_timeout,
                   :logger,
+                  :log_compaction,
                   :sanitize_logs,
                   :proxy
 
@@ -33,6 +34,7 @@ module OpenSRS
       @timeout  = options[:timeout]
       @open_timeout = options[:open_timeout]
       @logger   = options[:logger]
+      @log_compaction   = options[:log_compaction]
       @sanitize_logs = options[:sanitize_logs]
       @proxy    = URI.parse(options[:proxy]) if options[:proxy]
     end
@@ -117,6 +119,7 @@ module OpenSRS
       message = "#{message} for #{options[:object]} #{options[:action]}" if options[:object] && options[:action]
 
       line = [message, sanitize(type, data, options)].join("\n")
+      line.delete!("\n") if log_compaction
       logger.info(line)
     end
 
