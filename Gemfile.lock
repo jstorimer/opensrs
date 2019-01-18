@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    shopify-opensrs (0.3.15)
+    shopify-opensrs (0.3.16)
 
 GEM
   remote: https://rubygems.org/
