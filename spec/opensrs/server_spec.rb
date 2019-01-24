@@ -150,7 +150,7 @@ describe OpenSRS::Server do
       end
 
       describe "sanitize_logs" do
-        let(:xml) { "<?xml version=\"1.0\"?>\n<OPS_envelope>\n<item>foo</item><item key=\"reg_password\">password</item>\n/OPS_envelope>\n" }
+        let(:xml) { "<?xml version=\"1.0\"?>\n   <OPS_envelope>\n<item>foo bar</item><item key=\"reg_password\">password</item>\n/OPS_envelope>\n" }
         before :each do
           xml_processor.stub(:build).and_return xml
           xml_processor.stub(:parse).and_return xml
@@ -176,12 +176,12 @@ describe OpenSRS::Server do
           )
         end
 
-        it 'if log_compaction is on, remove lines from logs' do
+        it 'if log_compaction is on, remove lines and whitespace from the left from logs' do
           server.log_compaction = true
 
           server.call(action: "SW_REGISTER", object: "DOMAIN")
 
-          expect(logger.messages.first).not_to include("\n")
+          expect(logger.messages.first).to eq("[OpenSRS] Request XML for DOMAIN SW_REGISTER<?xml version=\"1.0\"?><OPS_envelope><item>foo bar</item><item key=\"reg_password\">password</item>/OPS_envelope>")
         end
 
         it 'if log_compaction is off, do not remove lines from logs' do

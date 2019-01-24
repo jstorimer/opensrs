@@ -118,9 +118,10 @@ module OpenSRS
       message = "[OpenSRS] #{type} XML"
       message = "#{message} for #{options[:object]} #{options[:action]}" if options[:object] && options[:action]
 
-      line = [message, sanitize(type, data, options)].join("\n")
-      line.delete!("\n") if log_compaction
-      logger.info(line)
+      logs = [message, sanitize(type, data, options)].join("\n")
+      logs = logs.split("\n").each { |line| line.lstrip! }.join('') if log_compaction
+
+      logger.info(logs)
     end
 
     def server_path
